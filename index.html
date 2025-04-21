@@ -24,6 +24,12 @@
     google.charts.load('current', {packages:['corechart']});
     google.charts.setOnLoadCallback(drawChart);
 
+
+    google.charts.load('current', {
+          packages: ['corechart','gauge'],
+          callback: drawAllCharts
+    });
+
     function drawChart() {
       // 2. Fetch data from your API
       fetch('https://5c1gfe4w0l.execute-api.us-east-1.amazonaws.com/get?limit=10')
