@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Niveles del tanque de agua</title>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 1rem; }
+    h1 { font-size: 1.5rem; }
+    #chart_div { width: 100%; height: 400px; }
+    #current { font-size: 1.2rem; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>Niveles del tanque de agua</h1>
+  <div id="current">Nivel actual...</div>
+  <div id="chart_div"></div>
+
+  <script>
+    // 1. Load the Google Charts library
+    google.charts.load('current', {packages:['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+      // 2. Fetch data from your API
+      fetch('https://5c1gfe4w0l.execute-api.us-east-1.amazonaws.com/get?limit=10')
+        .then(res => res.json())
+        .then(data => {
+          // data is [ ['Time','Level'], [t1, lvl1], ... ]
+          // 3. Display current level
+          const latest = data[data.length - 1][1];
+          document.getElementById('current')
+                  .textContent = `Nivel actual: ${latest} %`;
+
+          // 4. Convert to Google Charts DataTable
+          const dataTable = google.visualization.arrayToDataTable(data);
+
+          // 5. Draw the chart
+          const options = {
+            title: 'Niveles de agua recientes',
+            curveType: 'function',
+            legend: { position: 'none' },
+            vAxis: { title: 'Nivel (%)' },
+            hAxis: { title: 'Porcentaje' }
+          };
+          const chart = new google.visualization.LineChart(
+            document.getElementById('chart_div')
+          );
+          chart.draw(dataTable, options);
+        })
+        .catch(err => {
+          document.getElementById('current')
+                  .textContent = 'Error loading data.';
+          console.error(err);
+        });
+    }
+  </script>
+</body>
+</html>
+<!-- 
+https://waterleveldsb.s3.us-east-1.amazonaws.com/index.html?response-content-disposition=inline&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEA4aCXVzLWVhc3QtMSJGMEQCIAPTBqW86lJuDl3jpQev42izyL9HiLxNLQmUiwlqRDSCAiAuSogKh1oGEripbY1JZjTERBJKeVVMt4BWepv2ibOmpirCAwiW%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDc2NDI5MDQ4NDY2NiIM17lpyMq4qU1%2FJwtqKpYDisxSbANk%2Bm3E6bPrfniUSE46cSvoNJMuS3bpiSUCQQ8wrYgTY7vOhKKoC3gNMqcNekpaNVUIW5dlCpoPs6UdkYnfr9WQUCTAiGHjg6kB%2Fz6CQ8BLt2TCbFfGm9mV%2FJfVeT5SFIU1BQVbsbvrdYxkSFH%2BhY9HeQCfl7ZJ2Jt%2Fr39NHhjvR0xsyfS%2BNUdwRfyNyV7Y6xO9lZxu9mm56zA7fPMOsVaJphArUurlVQOMx%2FabwtLRVWkWAlTwUF8Qfj1rwTV%2FCNE6l1zH2YJlpvKvdZVtGJzRWE15erEwVilqYPehv64fu5OoTEUB0%2B%2FjCt6CSB4AvShRljlZ44gyKKdzg5cv8FDCbAwo5ngGk10A8AZLsR4vdS9P%2B5B6X0MUVX89tQDRhkYv2iO%2BojEBUNJqqyE8O4%2F85VpmwtJF4EqZCN0%2Fuq%2FjRl8ca0X4dkolGjLa%2FdVcrUlDJwPaYM2Bm2E4L5qvsBglw2C4b9Mz1K36lqFUXVz0RQVNkn7wI8pnQgdhTfBePpCnfA%2B%2Bk1wM8oX1BP1uayNeWzDDw47ABjrfAq2NdK9zRxC4pxRDumH40I8A6R5jHd2zMw9ivZDhQ%2FkhNI37d0QiNblZ22g61O4esxq5Qv74am0TK3k%2F4JAAO%2FeeHszSxN3v4Km2DwR24wwBmPZb22vUkr7GvrUrV3yk7JaVtZKF31Ii97Cif2tGqoWY3t96gnoXtGXUcyKqrJcvmL20EuDT47ZGQWHUq8WqTU9tIO0Ow4N2dpQCBHH5yfvojj086lcK6hXa%2BrXvgYzmuCI97tkAVq1116WNOgBDbEfiAo85RqMhpUo1EZCdFca4y7PeAgWUgws6Ud%2BIfz%2BJBfVxLt3lqrWoLNrvyDexKmrUBaDujuzNQ%2BTqfJJCFkf4StDfklYfDaj0Flzmd5m4%2Bk7z%2FGsF89XLwOdDgjRUJCZU3W8zkVzfhO2vzQhnbTSvsMUuTj7cyZ4azdpJE0CvKHO0lypbgprHgmz8ltI7FPD7q5gMSx1bLtD2D8CCzg%3D%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIA3D42DJG5HELGGVUK%2F20250419%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250419T210514Z&X-Amz-Expires=900&X-Amz-SignedHeaders=host&X-Amz-Signature=c4c959e50d905b6ed05ea172c78c6ad2ed607b2dd3c85c4b625d72a1e4e5187b
+//-->
